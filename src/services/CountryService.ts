@@ -8,12 +8,12 @@ const apiClient = axios.create({
   }
 })
 export default {
-  // getCountries(perPage: number, page: number) {
-  //   return apiClient.get(`/countries?_limit=${perPage}&_page=${page}`)
-  // },
-  getCountries() {
-    return apiClient.get('/countries')
+  getCountries(perPage: number, page: number) {
+    return apiClient.get(`/countries?_limit=${perPage}&_page=${page}`)
   },
+  // getCountries() {
+  //   return apiClient.get('/countries')
+  // },
   getCountry(id: string) {
     return apiClient.get('/countries/' + id)
   }

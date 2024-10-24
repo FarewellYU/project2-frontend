@@ -1,31 +1,56 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import CountryService from '@/services/CountryService';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { Country } from '@/types';
+import { useRoute } from 'vue-router'
 
 export default defineComponent({
-  name: 'MedalTable',
   setup() {
+    const route = useRoute();
+    const totalCountry = ref(0);
     const countries = ref<Country[] | null>(null);
 
-    onMounted(() => {
-      CountryService.getCountries()
+    // 从路由参数获取分页信息
+    const perPage = computed(() => parseInt(route.query.perPage as string) || 5);
+    const page = computed(() => parseInt(route.query.page as string) || 1);
+    
+    const hasNextPage = computed(() => {
+      const totalPages = Math.ceil(totalCountry.value / perPage.value);
+      return page.value < totalPages;
+    });
+
+    // 获取国家信息
+    const fetchCountries = () => {
+      CountryService.getCountries(perPage.value, page.value)
         .then((response) => {
           countries.value = response.data;
-          console.log(countries.value);
+          totalCountry.value = parseInt(response.headers['x-total-count']);
         })
         .catch((error) => {
           console.error('There was an error fetching countries!', error);
         });
+    };
+
+    // 在组件挂载时获取国家信息
+    onMounted(fetchCountries);
+
+    // 监听分页参数的变化
+    watch([page, perPage], () => {
+      fetchCountries();
     });
 
     return {
       countries,
+      totalCountry,
+      page,
+      perPage,
+      hasNextPage
     };
   },
 });
 </script>
+
 
 <template>
   <div class="container mx-auto">
@@ -59,6 +84,24 @@ export default defineComponent({
             </tr>
           </tbody>
         </table>
+        
+        <div class="flex w-[290px] mt-4">
+          <RouterLink
+            class="flex-1 text-blue-700 hover:underline text-left"
+            :to="{ name: 'country', query: { page: page - 1, perPage: perPage } }"
+            rel="prev"
+            v-if="page != 1"
+            >&#60; Prev Page</RouterLink
+          >
+    
+          <RouterLink
+            class="flex-1 text-blue-700 hover:underline text-right"
+            :to="{ name: 'country', query: { page: page + 1, perPage: perPage } }"
+            rel="next"
+            v-if="hasNextPage"
+            >Next Page &#62;</RouterLink
+          >
+        </div>
       </div>
     </div>
   </div>
