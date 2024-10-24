@@ -4,8 +4,8 @@ const apiClient = axios.create({
   withCredentials: false,
   headers: {
     Accept: 'application/json',
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 })
 export default {
   getCountries(perPage: number, page: number) {
@@ -14,7 +14,7 @@ export default {
   // getCountries() {
   //   return apiClient.get('/countries')
   // },
-  getCountry(id: string) {
-    return apiClient.get('/countries/' + id)
-  }
+  getCountry(countryid: string) {
+    return apiClient.get('/countries/' + countryid)
+  },
 }

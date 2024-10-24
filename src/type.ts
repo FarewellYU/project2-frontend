@@ -20,7 +20,7 @@ export interface DetailList {
     detailList: DetailList[];
   }
   
-  export interface MedalTable {
-    countries: Country[];
-  }
+  // export interface MedalTable {
+  //   countries: Country[];
+  // }
   
